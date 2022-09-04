@@ -1,0 +1,252 @@
+fileFormatVersion: 2
+guid: b2262411f4555d04d95050f378d3e79e
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: Age Test 001
+    100002: Bicuspid valve
+    100004: Bicuspid valve001
+    100006: Birth 003
+    100008: Camera003
+    100010: Camera003.Target
+    100012: Camera004
+    100014: Camera004.Target
+    100016: Camera005
+    100018: Camera005.Target
+    100020: Camera006
+    100022: Camera006.Target
+    100024: Camera007
+    100026: Camera007.Target
+    100028: Camera008
+    100030: Camera008.Target
+    100032: Camera009
+    100034: Camera009.Target
+    100036: Delete 001
+    100038: Display 005
+    100040: Display 006
+    100042: Display 007
+    100044: Event 005
+    100046: Event 006
+    100048: Event 007
+    100050: Force 001
+    100052: Group001
+    100054: //RootNode
+    100056: Heart_cross section
+    100058: Omni001
+    100060: Omni002
+    100062: Omni003
+    100064: Particle View 001
+    100066: Particle View 002
+    100068: PF Arrow001
+    100070: Position Icon 003
+    100072: Render 003
+    100074: semilunar 01
+    100076: semilunar 02
+    100078: Shape 003
+    100080: Sky001
+    100082: Sphere024
+    100084: Sphere025
+    100086: Sphere027
+    100088: Sphere032
+    100090: Spot001
+    100092: Spot001.Target
+    100094: Tricuspid valve
+    100096: Tricuspid valve001
+    400000: Age Test 001
+    400002: Bicuspid valve
+    400004: Bicuspid valve001
+    400006: Birth 003
+    400008: Camera003
+    400010: Camera003.Target
+    400012: Camera004
+    400014: Camera004.Target
+    400016: Camera005
+    400018: Camera005.Target
+    400020: Camera006
+    400022: Camera006.Target
+    400024: Camera007
+    400026: Camera007.Target
+    400028: Camera008
+    400030: Camera008.Target
+    400032: Camera009
+    400034: Camera009.Target
+    400036: Delete 001
+    400038: Display 005
+    400040: Display 006
+    400042: Display 007
+    400044: Event 005
+    400046: Event 006
+    400048: Event 007
+    400050: Force 001
+    400052: Group001
+    400054: //RootNode
+    400056: Heart_cross section
+    400058: Omni001
+    400060: Omni002
+    400062: Omni003
+    400064: Particle View 001
+    400066: Particle View 002
+    400068: PF Arrow001
+    400070: Position Icon 003
+    400072: Render 003
+    400074: semilunar 01
+    400076: semilunar 02
+    400078: Shape 003
+    400080: Sky001
+    400082: Sphere024
+    400084: Sphere025
+    400086: Sphere027
+    400088: Sphere032
+    400090: Spot001
+    400092: Spot001.Target
+    400094: Tricuspid valve
+    400096: Tricuspid valve001
+    2100000: 10 - Default
+    2100002: 11 - Default
+    2100004: 16 - Default
+    2100006: 09 - Default_02
+    2300000: Bicuspid valve001
+    2300002: Sphere024
+    2300004: Sphere025
+    2300006: Sphere027
+    2300008: Sphere032
+    2300010: Tricuspid valve001
+    3300000: Bicuspid valve001
+    3300002: Sphere024
+    3300004: Sphere025
+    3300006: Sphere027
+    3300008: Sphere032
+    3300010: Tricuspid valve001
+    4300000: Sphere024
+    4300002: Sphere025
+    4300004: Tricuspid valve001
+    4300006: Bicuspid valve001
+    4300008: Sphere027
+    4300010: Sphere032
+    4300012: Tricuspid valve
+    4300014: Bicuspid valve
+    4300016: semilunar 02
+    4300018: semilunar 01
+    4300020: Heart_cross section
+    7400000: Heart New scanline
+    9500000: //RootNode
+    13700000: Bicuspid valve
+    13700002: Heart_cross section
+    13700004: semilunar 01
+    13700006: semilunar 02
+    13700008: Tricuspid valve
+    2186277476908879412: ImportLogs
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Heart New scanline
+      takeName: Heart New scanline
+      firstFrame: 0
+      lastFrame: 30
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 0.01
+    hasPreviousCalculatedGlobalScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
