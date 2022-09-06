@@ -168,7 +168,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: blendShape.Sphere027
-    path: Group001/Heart_cross section
+    path: Heart_cross section
     classID: 137
     script: {fileID: 0}
   - curve:
@@ -295,7 +295,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: blendShape.Sphere032
-    path: Group001/Heart_cross section
+    path: Heart_cross section
     classID: 137
     script: {fileID: 0}
   m_PPtrCurves: []
@@ -307,14 +307,14 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 739502272
+      path: 3925317295
       attribute: 531285142
       script: {fileID: 0}
       typeID: 137
       customType: 20
       isPPtrCurve: 0
     - serializedVersion: 2
-      path: 739502272
+      path: 3925317295
       attribute: 1994064216
       script: {fileID: 0}
       typeID: 137
@@ -493,7 +493,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: blendShape.Sphere027
-    path: Group001/Heart_cross section
+    path: Heart_cross section
     classID: 137
     script: {fileID: 0}
   - curve:
@@ -620,7 +620,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: blendShape.Sphere032
-    path: Group001/Heart_cross section
+    path: Heart_cross section
     classID: 137
     script: {fileID: 0}
   m_EulerEditorCurves: []

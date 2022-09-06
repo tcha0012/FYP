@@ -123,7 +123,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: blendShape.Bicuspid valve001
-    path: Group001/Bicuspid valve
+    path: Bicuspid valve
     classID: 137
     script: {fileID: 0}
   m_PPtrCurves: []
@@ -135,7 +135,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 3983100032
+      path: 2196180368
       attribute: 593607599
       script: {fileID: 0}
       typeID: 137
@@ -269,7 +269,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: blendShape.Bicuspid valve001
-    path: Group001/Bicuspid valve
+    path: Bicuspid valve
     classID: 137
     script: {fileID: 0}
   m_EulerEditorCurves: []
