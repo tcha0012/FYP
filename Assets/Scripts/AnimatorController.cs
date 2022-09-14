@@ -33,7 +33,7 @@ public class AnimatorController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (syncFlag && (syncIteration < timings.timingsList.Count))
+        if (syncFlag)
         {
             StartCoroutine(AnimationSync());
         }
@@ -116,9 +116,14 @@ public class AnimatorController : MonoBehaviour
         }
         else
         {
+            // otherwise this block searches for the next valid timing and ensure the coroutine wait for that duration
+            // first increment of iteration
             syncIteration++;
+            // setting flag for while loop
             bool whileFlag = false;
+            // initialise empty variable
             string nextValidTiming = "";
+            // while loop that finds the next valid timing
             while (!whileFlag)
             {
                 nextValidTiming = syncTimings[syncIteration];
@@ -150,6 +155,21 @@ public class AnimatorController : MonoBehaviour
 
         // waits until the we reach the timing specified for the current iteration before running again
         yield return new WaitForSeconds(timingDifference);
-        syncFlag = true;
+
+        // exit condition for the end of the data
+        if ((syncIteration < timings.timingsList.Count - 1))
+        {
+            // sets flag to true for next iteration
+            syncFlag = true;
+        }
+        else
+        {
+            // disables animation
+            heartCrossAni.enabled = false;
+            // bicuspidAni.enabled = false;
+            // tricuspidAni.enabled = false;
+            // rightSemiAni.enabled = false;
+            // leftSemiAni.enabled = false;
+        }
     }
 }
