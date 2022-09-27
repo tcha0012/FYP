@@ -361,7 +361,7 @@ GameObject:
   - component: {fileID: 725553951}
   - component: {fileID: 725553950}
   m_Layer: 0
-  m_Name: AnimatorControler
+  m_Name: Animator Controller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
