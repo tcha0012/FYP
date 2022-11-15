@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AnimatorController : MonoBehaviour
+public class HeartAniController : MonoBehaviour
 {
     // references to each animator
     public Animator heartCrossAni;
