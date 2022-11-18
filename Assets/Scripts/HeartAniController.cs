@@ -12,6 +12,9 @@ public class HeartAniController : MonoBehaviour
     public Animator rightSemiAni;
     public Animator leftSemiAni;
 
+    public AudioSource firstBeatAudio;
+    public AudioSource secondBeatAudio;
+
     // container for the list of timings
     private TimingsContainer timings = new TimingsContainer();
 
@@ -83,6 +86,7 @@ public class HeartAniController : MonoBehaviour
                 {
                     syncFrames = 12;
                 }
+                firstBeatAudio.Play();
                 break;
             case 1:
                 // q at frame 27
@@ -99,6 +103,7 @@ public class HeartAniController : MonoBehaviour
             case 4:
                 // t at frame 50    
                 syncFrames = 19;
+                secondBeatAudio.Play();
                 break;
         }
 
