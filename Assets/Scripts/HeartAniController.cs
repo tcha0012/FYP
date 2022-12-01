@@ -30,7 +30,7 @@ public class HeartAniController : MonoBehaviour
     void Start()
     {
         // populates the timings container object
-        ReadData("TestData");
+        ReadData("TestEcgData");
     }
 
     // Update is called once per frame
@@ -51,7 +51,7 @@ public class HeartAniController : MonoBehaviour
         // creates a list of strings where each item is a cell's contents
         string[] dataList = parsedData.text.Split(new string[] { ",", "\n" }, StringSplitOptions.None);
         // meta data about the csv
-        int columnCount = 5;
+        int columnCount = 3;
         int rowCount = dataList.Length / columnCount - 1;
         // for loop that populates the individual timing lists
         for (int i = 0; i < rowCount; i++)
@@ -59,8 +59,6 @@ public class HeartAniController : MonoBehaviour
             timings.timingsList.Add(dataList[columnCount * (i + 1)]);
             timings.timingsList.Add(dataList[columnCount * (i + 1) + 1]);
             timings.timingsList.Add(dataList[columnCount * (i + 1) + 2]);
-            timings.timingsList.Add(dataList[columnCount * (i + 1) + 3]);
-            timings.timingsList.Add(dataList[columnCount * (i + 1) + 4]);
         }
     }
 
@@ -68,13 +66,13 @@ public class HeartAniController : MonoBehaviour
     {
         syncFlag = false;
         // variables for synchronising animation
-        int syncFrames = 12;
+        int syncFrames = 0;
         float syncSpeed;
         List<string> syncTimings = timings.timingsList;
         float timingDifference;
 
         // sets the sync frame and list of timings according to where in the sync cycle we are
-        switch (syncIteration % 5)
+        switch (syncIteration % 3)
         {
             case 0:
                 // p at frame 12
@@ -89,20 +87,12 @@ public class HeartAniController : MonoBehaviour
                 firstBeatAudio.Play();
                 break;
             case 1:
-                // q at frame 27
-                syncFrames = 15;
+                // r at frame 29
+                syncFrames = 17;
                 break;
             case 2:
-                // r at frame 29
-                syncFrames = 2;
-                break;
-            case 3:
-                // s at frame 31
-                syncFrames = 2;
-                break;
-            case 4:
                 // t at frame 50    
-                syncFrames = 19;
+                syncFrames = 21;
                 secondBeatAudio.Play();
                 break;
         }
@@ -110,6 +100,7 @@ public class HeartAniController : MonoBehaviour
         // checks for missing values from the segmentation
         if (syncTimings[syncIteration] != "NULL")
         {
+            Debug.Log(syncFrames);
             // calculates speed of animation based on sync timing
             timingDifference = float.Parse(syncTimings[syncIteration]) - lastTiming;
             // sync frames divided by the timing gives the fps of the the animation divided by 60fps to derive the speed
