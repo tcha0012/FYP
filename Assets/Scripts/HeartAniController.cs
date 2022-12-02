@@ -183,11 +183,25 @@ public class HeartAniController : MonoBehaviour
 
     IEnumerator BiAnimationSync()
     {
+        biSyncFlag = false;
+        // variables for synchronising animation
+        int syncFrames = 0;
+        float syncSpeed;
+        List<string> syncTimings = biTimings.timingsList;
+        float timingDifference;
+
         yield return null;
     }
 
     IEnumerator SlAnimationSync()
     {
+        slSyncFlag = false;
+        // variables for synchronising animation
+        int syncFrames = 0;
+        float syncSpeed;
+        List<string> syncTimings = biTimings.timingsList;
+        float timingDifference;
+
         yield return null;
     }
 }
