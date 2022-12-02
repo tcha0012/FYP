@@ -16,7 +16,7 @@ public class HeartAniController : MonoBehaviour
     public AudioSource secondBeatAudio;
 
     // container for the list of timings
-    private TimingsContainer timings = new TimingsContainer();
+    private TimingsContainer ecgTimings = new TimingsContainer();
 
     // variables for coroutine that need to be held between runs
     // position in the sync cycle
@@ -30,7 +30,7 @@ public class HeartAniController : MonoBehaviour
     void Start()
     {
         // populates the timings container object
-        ReadData("TestEcgData");
+        ReadData("TestEcgData", ecgTimings);
     }
 
     // Update is called once per frame
@@ -43,22 +43,24 @@ public class HeartAniController : MonoBehaviour
     }
 
     // function that takes csv file and populates the timings container object
-    private void ReadData(string dataPath)
+    private void ReadData(string dataPath, TimingsContainer timings)
     {
         // parsing csv into text asset
         TextAsset parsedData = new TextAsset();
         parsedData = Resources.Load<TextAsset>(dataPath);
+        // calculates the number of columns in the inputted csv
+        int columnCount = parsedData.text.Split(new string[] { "\n" }, StringSplitOptions.None)[0].Split(',').Length;
         // creates a list of strings where each item is a cell's contents
         string[] dataList = parsedData.text.Split(new string[] { ",", "\n" }, StringSplitOptions.None);
         // meta data about the csv
-        int columnCount = 3;
         int rowCount = dataList.Length / columnCount - 1;
         // for loop that populates the individual timing lists
         for (int i = 0; i < rowCount; i++)
         {
-            timings.timingsList.Add(dataList[columnCount * (i + 1)]);
-            timings.timingsList.Add(dataList[columnCount * (i + 1) + 1]);
-            timings.timingsList.Add(dataList[columnCount * (i + 1) + 2]);
+            for (int j = 0; j < columnCount; j++)
+            {
+                timings.timingsList.Add(dataList[columnCount * (i + 1) + j]);
+            }
         }
     }
 
@@ -68,7 +70,7 @@ public class HeartAniController : MonoBehaviour
         // variables for synchronising animation
         int syncFrames = 0;
         float syncSpeed;
-        List<string> syncTimings = timings.timingsList;
+        List<string> syncTimings = ecgTimings.timingsList;
         float timingDifference;
 
         // sets the sync frame and list of timings according to where in the sync cycle we are
@@ -100,7 +102,6 @@ public class HeartAniController : MonoBehaviour
         // checks for missing values from the segmentation
         if (syncTimings[syncIteration] != "NULL")
         {
-            Debug.Log(syncFrames);
             // calculates speed of animation based on sync timing
             timingDifference = float.Parse(syncTimings[syncIteration]) - lastTiming;
             // sync frames divided by the timing gives the fps of the the animation divided by 60fps to derive the speed
@@ -153,7 +154,7 @@ public class HeartAniController : MonoBehaviour
         yield return new WaitForSeconds(timingDifference);
 
         // exit condition for the end of the data
-        if ((syncIteration < timings.timingsList.Count - 1))
+        if ((syncIteration < ecgTimings.timingsList.Count - 1))
         {
             // sets flag to true for next iteration
             syncFlag = true;
