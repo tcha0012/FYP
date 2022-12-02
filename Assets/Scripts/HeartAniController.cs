@@ -12,25 +12,36 @@ public class HeartAniController : MonoBehaviour
     public Animator rightSemiAni;
     public Animator leftSemiAni;
 
+    // heartbeat sounds
     public AudioSource firstBeatAudio;
     public AudioSource secondBeatAudio;
 
     // container for the list of timings
     private TimingsContainer ecgTimings = new TimingsContainer();
+    private TimingsContainer biTimings = new TimingsContainer();
+    private TimingsContainer slTimings = new TimingsContainer();
 
     // variables for coroutine that need to be held between runs
     // position in the sync cycle
-    private int syncIteration = 0;
+    private int ecgSyncIteration = 0;
+    private int biSyncIteration = 0;
+    private int slSyncIteration = 0;
     // the timing for the previous iteration
-    private float lastTiming = 0;
+    private float ecgLastTiming = 0;
+    private float biLastTiming = 0;
+    private float slLastTiming = 0;
     // flag for routine wait time
     private bool ecgSyncFlag = true;
+    private bool biSyncFlag = true;
+    private bool slSyncFlag = true;
 
     // Start is called before the first frame update
     void Start()
     {
-        // populates the timings container object
+        // populates each timings container object
         ReadData("TestEcgData", ecgTimings);
+        ReadData("TestBiData", biTimings);
+        ReadData("TestSlData", slTimings);
     }
 
     // Update is called once per frame
@@ -39,6 +50,14 @@ public class HeartAniController : MonoBehaviour
         if (ecgSyncFlag)
         {
             StartCoroutine(EcgAnimationSync());
+        }
+        if (biSyncFlag)
+        {
+            StartCoroutine(BiAnimationSync());
+        }
+        if (slSyncFlag)
+        {
+            StartCoroutine(SlAnimationSync());
         }
     }
 
@@ -74,11 +93,11 @@ public class HeartAniController : MonoBehaviour
         float timingDifference;
 
         // sets the sync frame and list of timings according to where in the sync cycle we are
-        switch (syncIteration % 3)
+        switch (ecgSyncIteration % 3)
         {
             case 0:
                 // p at frame 12
-                if (syncIteration != 0)
+                if (ecgSyncIteration != 0)
                 {
                     syncFrames = 22;
                 }
@@ -100,22 +119,22 @@ public class HeartAniController : MonoBehaviour
         }
 
         // checks for missing values from the segmentation
-        if (syncTimings[syncIteration] != "NULL")
+        if (syncTimings[ecgSyncIteration] != "NULL")
         {
             // calculates speed of animation based on sync timing
-            timingDifference = float.Parse(syncTimings[syncIteration]) - lastTiming;
+            timingDifference = float.Parse(syncTimings[ecgSyncIteration]) - ecgLastTiming;
             // sync frames divided by the timing gives the fps of the the animation divided by 60fps to derive the speed
             syncSpeed = (syncFrames / timingDifference) / 60;
             // sets the speed of the cross section
             heartCrossAni.speed = syncSpeed;
             // saves the values of current time for the next iteration
-            lastTiming = float.Parse(syncTimings[syncIteration]);
+            ecgLastTiming = float.Parse(syncTimings[ecgSyncIteration]);
         }
         else
         {
             // otherwise this block searches for the next valid timing and ensure the coroutine wait for that duration
             // first increment of iteration
-            syncIteration++;
+            ecgSyncIteration++;
             // setting flag for while loop
             bool whileFlag = false;
             // initialise empty variable
@@ -123,18 +142,18 @@ public class HeartAniController : MonoBehaviour
             // while loop that finds the next valid timing
             while (!whileFlag)
             {
-                nextValidTiming = syncTimings[syncIteration];
+                nextValidTiming = syncTimings[ecgSyncIteration];
                 if (nextValidTiming != "NULL")
                 {
                     whileFlag = true;
                 }
                 else
                 {
-                    syncIteration++;
+                    ecgSyncIteration++;
                 }
             }
             // sets the appropraite wait time if the value is missing
-            timingDifference = float.Parse(nextValidTiming) - lastTiming;
+            timingDifference = float.Parse(nextValidTiming) - ecgLastTiming;
         }
 
         // if statement ensures the animation only starts playing after the first sync speed is calculated
@@ -144,13 +163,13 @@ public class HeartAniController : MonoBehaviour
         }
 
         // increment iteration to track where in pqrst cycle we are
-        syncIteration++;
+        ecgSyncIteration++;
 
         // waits until the we reach the timing specified for the current iteration before running again
         yield return new WaitForSeconds(timingDifference);
 
         // exit condition for the end of the data
-        if ((syncIteration < ecgTimings.timingsList.Count - 1))
+        if ((ecgSyncIteration < ecgTimings.timingsList.Count - 1))
         {
             // sets flag to true for next iteration
             ecgSyncFlag = true;
@@ -160,5 +179,15 @@ public class HeartAniController : MonoBehaviour
             // disables animation
             heartCrossAni.enabled = false;
         }
+    }
+
+    IEnumerator BiAnimationSync()
+    {
+        yield return null;
+    }
+
+    IEnumerator SlAnimationSync()
+    {
+        yield return null;
     }
 }
