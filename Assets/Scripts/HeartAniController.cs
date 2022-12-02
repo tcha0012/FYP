@@ -24,7 +24,7 @@ public class HeartAniController : MonoBehaviour
     // the timing for the previous iteration
     private float lastTiming = 0;
     // flag for routine wait time
-    private bool syncFlag = true;
+    private bool ecgSyncFlag = true;
 
     // Start is called before the first frame update
     void Start()
@@ -36,9 +36,9 @@ public class HeartAniController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (syncFlag)
+        if (ecgSyncFlag)
         {
-            StartCoroutine(AnimationSync());
+            StartCoroutine(EcgAnimationSync());
         }
     }
 
@@ -64,9 +64,9 @@ public class HeartAniController : MonoBehaviour
         }
     }
 
-    IEnumerator AnimationSync()
+    IEnumerator EcgAnimationSync()
     {
-        syncFlag = false;
+        ecgSyncFlag = false;
         // variables for synchronising animation
         int syncFrames = 0;
         float syncSpeed;
@@ -141,10 +141,6 @@ public class HeartAniController : MonoBehaviour
         if (!heartCrossAni.enabled)
         {
             heartCrossAni.enabled = true;
-            // bicuspidAni.enabled = true;
-            // tricuspidAni.enabled = true;
-            // rightSemiAni.enabled = true;
-            // leftSemiAni.enabled = true;
         }
 
         // increment iteration to track where in pqrst cycle we are
@@ -157,16 +153,12 @@ public class HeartAniController : MonoBehaviour
         if ((syncIteration < ecgTimings.timingsList.Count - 1))
         {
             // sets flag to true for next iteration
-            syncFlag = true;
+            ecgSyncFlag = true;
         }
         else
         {
             // disables animation
             heartCrossAni.enabled = false;
-            // bicuspidAni.enabled = false;
-            // tricuspidAni.enabled = false;
-            // rightSemiAni.enabled = false;
-            // leftSemiAni.enabled = false;
         }
     }
 }
