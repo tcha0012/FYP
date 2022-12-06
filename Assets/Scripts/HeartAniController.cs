@@ -7,6 +7,7 @@ public class HeartAniController : MonoBehaviour
 {
     // references to each animator
     public Animator heartCrossAni;
+    // 
     public Animator bicuspidAni;
     public Animator tricuspidAni;
     public Animator rightSemiAni;
@@ -18,21 +19,21 @@ public class HeartAniController : MonoBehaviour
 
     // container for the list of timings
     private TimingsContainer ecgTimings = new TimingsContainer();
-    private TimingsContainer biTimings = new TimingsContainer();
+    private TimingsContainer cuspTimings = new TimingsContainer();
     private TimingsContainer slTimings = new TimingsContainer();
 
     // variables for coroutine that need to be held between runs
     // position in the sync cycle
     private int ecgSyncIteration = 0;
-    private int biSyncIteration = 0;
+    private int cuspSyncIteration = 0;
     private int slSyncIteration = 0;
     // the timing for the previous iteration
     private float ecgLastTiming = 0;
-    private float biLastTiming = 0;
+    private float cuspLastTiming = 0;
     private float slLastTiming = 0;
     // flag for routine wait time
     private bool ecgSyncFlag = true;
-    private bool biSyncFlag = true;
+    private bool cuspSyncFlag = true;
     private bool slSyncFlag = true;
 
     // Start is called before the first frame update
@@ -40,7 +41,7 @@ public class HeartAniController : MonoBehaviour
     {
         // populates each timings container object
         ReadData("TestEcgData", ecgTimings);
-        ReadData("TestBiData", biTimings);
+        ReadData("TestCuspData", cuspTimings);
         ReadData("TestSlData", slTimings);
     }
 
@@ -51,9 +52,9 @@ public class HeartAniController : MonoBehaviour
         {
             StartCoroutine(EcgAnimationSync());
         }
-        if (biSyncFlag)
+        if (cuspSyncFlag)
         {
-            StartCoroutine(BiAnimationSync());
+            StartCoroutine(CuspAnimationSync());
         }
         if (slSyncFlag)
         {
@@ -181,13 +182,13 @@ public class HeartAniController : MonoBehaviour
         }
     }
 
-    IEnumerator BiAnimationSync()
+    IEnumerator CuspAnimationSync()
     {
-        biSyncFlag = false;
+        cuspSyncFlag = false;
         // variables for synchronising animation
         int syncFrames = 0;
         float syncSpeed;
-        List<string> syncTimings = biTimings.timingsList;
+        List<string> syncTimings = cuspTimings.timingsList;
         float timingDifference;
 
         yield return null;
@@ -199,7 +200,7 @@ public class HeartAniController : MonoBehaviour
         // variables for synchronising animation
         int syncFrames = 0;
         float syncSpeed;
-        List<string> syncTimings = biTimings.timingsList;
+        List<string> syncTimings = slTimings.timingsList;
         float timingDifference;
 
         yield return null;
