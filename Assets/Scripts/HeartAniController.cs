@@ -186,12 +186,76 @@ public class HeartAniController : MonoBehaviour
     {
         cuspSyncFlag = false;
         // variables for synchronising animation
-        int syncFrames = 0;
+        int syncFrames = 60;
         float syncSpeed;
         List<string> syncTimings = cuspTimings.timingsList;
         float timingDifference;
 
-        yield return null;
+        // checks for missing values from the segmentation
+        if (syncTimings[cuspSyncIteration] != "NULL")
+        {
+            // calculates speed of animation based on sync timing
+            timingDifference = float.Parse(syncTimings[cuspSyncIteration]) - cuspLastTiming;
+            Debug.Log(timingDifference);
+            // sync frames divided by the timing gives the fps of the the animation divided by 60fps to derive the speed
+            syncSpeed = (syncFrames / timingDifference) / 60;
+            // sets the speed of the cross section
+            tricuspidAni.speed = syncSpeed;
+            bicuspidAni.speed = syncSpeed;
+            // saves the values of current time for the next iteration
+            cuspLastTiming = float.Parse(syncTimings[cuspSyncIteration]);
+        }
+        else
+        {
+            // otherwise this block searches for the next valid timing and ensure the coroutine wait for that duration
+            // first increment of iteration
+            cuspSyncIteration++;
+            // setting flag for while loop
+            bool whileFlag = false;
+            // initialise empty variable
+            string nextValidTiming = "";
+            // while loop that finds the next valid timing
+            while (!whileFlag)
+            {
+                nextValidTiming = syncTimings[cuspSyncIteration];
+                if (nextValidTiming != "NULL")
+                {
+                    whileFlag = true;
+                }
+                else
+                {
+                    cuspSyncIteration++;
+                }
+            }
+            // sets the appropraite wait time if the value is missing
+            timingDifference = float.Parse(nextValidTiming) - cuspLastTiming;
+        }
+
+        // if statement ensures the animation only starts playing after the first sync speed is calculated
+        if (!bicuspidAni.enabled && !tricuspidAni.enabled)
+        {
+            bicuspidAni.enabled = true;
+            tricuspidAni.enabled = true;
+        }
+
+        // increment iteration to track where in pqrst cycle we are
+        cuspSyncIteration++;
+
+        // waits until the we reach the timing specified for the current iteration before running again
+        yield return new WaitForSeconds(timingDifference);
+
+        // exit condition for the end of the data
+        if ((cuspSyncIteration < cuspTimings.timingsList.Count - 1))
+        {
+            // sets flag to true for next iteration
+            cuspSyncFlag = true;
+        }
+        else
+        {
+            // disables animation
+            bicuspidAni.enabled = false;
+            tricuspidAni.enabled = false;
+        }
     }
 
     IEnumerator SlAnimationSync()
@@ -203,6 +267,81 @@ public class HeartAniController : MonoBehaviour
         List<string> syncTimings = slTimings.timingsList;
         float timingDifference;
 
-        yield return null;
+        // sets the sync frame and list of timings according to where in the sync cycle we are
+        switch (slSyncIteration % 2)
+        {
+            case 0:
+                syncFrames = 26;
+                break;
+            case 1:
+                syncFrames = 34;
+                break;
+        }
+
+        // checks for missing values from the segmentation
+        if (syncTimings[slSyncIteration] != "NULL")
+        {
+            // calculates speed of animation based on sync timing
+            timingDifference = float.Parse(syncTimings[slSyncIteration]) - slLastTiming;
+            Debug.Log(timingDifference);
+            // sync frames divided by the timing gives the fps of the the animation divided by 60fps to derive the speed
+            syncSpeed = (syncFrames / timingDifference) / 60;
+            // sets the speed of the cross section
+            rightSemiAni.speed = syncSpeed;
+            leftSemiAni.speed = syncSpeed;
+            // saves the values of current time for the next iteration
+            slLastTiming = float.Parse(syncTimings[slSyncIteration]);
+        }
+        else
+        {
+            // otherwise this block searches for the next valid timing and ensure the coroutine wait for that duration
+            // first increment of iteration
+            slSyncIteration++;
+            // setting flag for while loop
+            bool whileFlag = false;
+            // initialise empty variable
+            string nextValidTiming = "";
+            // while loop that finds the next valid timing
+            while (!whileFlag)
+            {
+                nextValidTiming = syncTimings[slSyncIteration];
+                if (nextValidTiming != "NULL")
+                {
+                    whileFlag = true;
+                }
+                else
+                {
+                    slSyncIteration++;
+                }
+            }
+            // sets the appropraite wait time if the value is missing
+            timingDifference = float.Parse(nextValidTiming) - slLastTiming;
+        }
+
+        // if statement ensures the animation only starts playing after the first sync speed is calculated
+        if (!rightSemiAni.enabled && !leftSemiAni.enabled)
+        {
+            rightSemiAni.enabled = true;
+            leftSemiAni.enabled = true;
+        }
+
+        // increment iteration to track where in pqrst cycle we are
+        slSyncIteration++;
+
+        // waits until the we reach the timing specified for the current iteration before running again
+        yield return new WaitForSeconds(timingDifference);
+
+        // exit condition for the end of the data
+        if ((slSyncIteration < slTimings.timingsList.Count - 1))
+        {
+            // sets flag to true for next iteration
+            slSyncFlag = true;
+        }
+        else
+        {
+            // disables animation
+            rightSemiAni.enabled = false;
+            leftSemiAni.enabled = false;
+        }
     }
 }
