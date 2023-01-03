@@ -196,7 +196,6 @@ public class HeartAniController : MonoBehaviour
         {
             // calculates speed of animation based on sync timing
             timingDifference = float.Parse(syncTimings[cuspSyncIteration]) - cuspLastTiming;
-            Debug.Log(timingDifference);
             // sync frames divided by the timing gives the fps of the the animation divided by 60fps to derive the speed
             syncSpeed = (syncFrames / timingDifference) / 60;
             // sets the speed of the cross section
@@ -283,7 +282,6 @@ public class HeartAniController : MonoBehaviour
         {
             // calculates speed of animation based on sync timing
             timingDifference = float.Parse(syncTimings[slSyncIteration]) - slLastTiming;
-            Debug.Log(timingDifference);
             // sync frames divided by the timing gives the fps of the the animation divided by 60fps to derive the speed
             syncSpeed = (syncFrames / timingDifference) / 60;
             // sets the speed of the cross section
