@@ -20,6 +20,7 @@ public class EcgLineRenderer : MonoBehaviour
 
     private TimingsContainer lineTimings = new TimingsContainer();
     private int valueIndex = 0;
+    private bool runningFlag = true;
 
     // Called when application or editor opens
     void Awake()
@@ -45,16 +46,15 @@ public class EcgLineRenderer : MonoBehaviour
         lineRenderer.enabled = false;
     }
 
-    void Update()
+    private void Start()
     {
-        StartCoroutine(DrawLine());
+        InvokeRepeating("DrawLine", 0.0f, 0.002f);
     }
 
-    IEnumerator DrawLine()
+    void DrawLine()
     {
         AddPoint(float.Parse(lineTimings.timingsList[valueIndex]));
         valueIndex++;
-        yield return new WaitForSeconds(0.2f);
     }
 
     // Initializes line and transform components
@@ -110,7 +110,7 @@ public class EcgLineRenderer : MonoBehaviour
         // Add a point on the left
         lineRenderer.positionCount++;
 
-        double dx = 0.2;
+        double dx = DeltaTimeToDeltaX(0.002);
 
         // Move previous position to the left
         for (int i = lineRenderer.positionCount - 1; i > 0; --i)
@@ -161,6 +161,13 @@ public class EcgLineRenderer : MonoBehaviour
             lineRenderer.SetPosition(1, new Vector3(originX, y));
         }
     }
+
+    double DeltaTimeToDeltaX(double t)
+    {
+        double p = t / xRange;
+        return p * T.rect.width;
+    }
+
 
     float ValueToY(float val)
     {
