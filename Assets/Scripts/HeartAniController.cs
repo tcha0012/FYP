@@ -50,6 +50,7 @@ public class HeartAniController : MonoBehaviour
         ReadData("TestEcgData", ecgTimings);
         ReadData("TestCuspData", cuspTimings);
         ReadData("TestSlData", slTimings);
+
         start_time = Time.time;
         
     }
@@ -58,7 +59,9 @@ public class HeartAniController : MonoBehaviour
     void Update()
     {
         curr_time = Time.time;
-        Debug.Log("Update: " + bicuspidAni.name);
+        // bicuspidAni.Play("bicuspid_animation");
+        // tricuspidAni.Play("tricuspid_animation");
+        // heartCrossAni.Play("heart_cross_animation");
 
         if (ecgSyncFlag)
         {
@@ -102,7 +105,7 @@ public class HeartAniController : MonoBehaviour
     {
         List<string> syncTimings = ecgTimings.timingsList;
         ecgSyncFlag = false;
-        Debug.Log(heartCrossAni.GetCurrentAnimatorStateInfo(0).normalizedTime * 60);
+        // Debug.Log(heartCrossAni.GetCurrentAnimatorStateInfo(0).normalizedTime * 60);
         if ((float.Parse(syncTimings[ecgSyncIteration]) <= curr_time) || (ecg_first_flag)) {
             // variables for synchronising animation
             
@@ -127,7 +130,7 @@ public class HeartAniController : MonoBehaviour
 
                     // syncFrames = 22;
                     // going from frame 50 to 12
-                    syncFrames = ((12.0f/60.0f - heartCrossAni.GetCurrentAnimatorStateInfo(0).normalizedTime)%1+1)%1 * 60f;
+                    syncFrames = ((12.0f/60.0f - heartCrossAni.GetCurrentAnimatorStateInfo(0).normalizedTime)%1+1)%1 * 50f;
 
                     firstBeatAudio.Play();
                     break;
@@ -135,12 +138,12 @@ public class HeartAniController : MonoBehaviour
                     // r at frame 29
                     // syncFrames = 17;
                     // going from current frame to frame 29
-                    syncFrames = ((29.0f/60.0f - heartCrossAni.GetCurrentAnimatorStateInfo(0).normalizedTime)%1+1)%1 * 60.0f;
+                    syncFrames = ((29.0f/60.0f - heartCrossAni.GetCurrentAnimatorStateInfo(0).normalizedTime)%1+1)%1 * 50.0f;
                     break;
                 case 2:
                     // t at frame 50    
                     // syncFrames = 21;
-                    syncFrames = ((50.0f/60.0f - heartCrossAni.GetCurrentAnimatorStateInfo(0).normalizedTime)%1+1)%1 * 60.0f;
+                    syncFrames = ((50.0f/60.0f - heartCrossAni.GetCurrentAnimatorStateInfo(0).normalizedTime)%1+1)%1 * 50.0f;
                     secondBeatAudio.Play();
                     break;
             }
@@ -199,6 +202,7 @@ public class HeartAniController : MonoBehaviour
         cuspSyncFlag = false;
         List<string> syncTimings = cuspTimings.timingsList;
         float state = bicuspidAni.GetCurrentAnimatorStateInfo(0).normalizedTime;
+        Debug.Log(state.ToString());
         
         if (state > 0.7)
         {
@@ -242,18 +246,18 @@ public class HeartAniController : MonoBehaviour
             
             if ((state == 0) | ((state > 0.8) & state < 1.0))
             {
-                syncFrames = (( 0 -state) % 1 + 1) % 1 * 60 + 60;
+                syncFrames = (( 0 -state) % 1 + 1) % 1 * 50 + 50;
             }
             else
             {
-                syncFrames = ((0 -state) % 1 + 1) % 1 * 60;
+                syncFrames = ((0 -state) % 1 + 1) % 1 * 50;
             }
             syncSpeed = (syncFrames / timingDifference) / 60;
 
             tricuspidAni.speed = syncSpeed;
             bicuspidAni.speed = syncSpeed;
 
-            Debug.Log(state.ToString() + " " + syncFrames.ToString() + " " + syncSpeed.ToString());
+            // Debug.Log(state.ToString() + " " + syncFrames.ToString() + " " + syncSpeed.ToString());
 
             // if statement ensures the animation only starts playing after the first sync speed is calculated
             if (!bicuspidAni.enabled && !tricuspidAni.enabled)
