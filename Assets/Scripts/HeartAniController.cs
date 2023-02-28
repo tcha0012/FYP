@@ -58,7 +58,7 @@ public class HeartAniController : MonoBehaviour
     void Update()
     {
         curr_time = Time.time;
-        Debug.Log("Update: " + bicuspidAni.name);
+        
 
         if (ecgSyncFlag)
         {
@@ -102,8 +102,11 @@ public class HeartAniController : MonoBehaviour
     {
         List<string> syncTimings = ecgTimings.timingsList;
         ecgSyncFlag = false;
-        Debug.Log(heartCrossAni.GetCurrentAnimatorStateInfo(0).normalizedTime * 60);
-        if ((float.Parse(syncTimings[ecgSyncIteration]) <= curr_time) || (ecg_first_flag)) {
+        int ecgSyncSwitch = ecgSyncIteration % 3;
+        float state = heartCrossAni.GetCurrentAnimatorStateInfo(0).normalizedTime;
+        //if ((float.Parse(syncTimings[ecgSyncIteration]) <= curr_time) || (ecg_first_flag))
+        if ((((ecgSyncSwitch == 0) & (state > 0) & state < 0.4) | ((ecgSyncSwitch == 1) & (state > 0.2)) | ((ecgSyncSwitch == 2) & (state > 0.483333))) | ecg_first_flag)
+        {
             // variables for synchronising animation
             
             float syncFrames = 0;
@@ -118,9 +121,8 @@ public class HeartAniController : MonoBehaviour
 
             ecg_first_flag = false;
             float next_timing = float.Parse(syncTimings[ecgSyncIteration]);
-
             // sets the sync frame and list of timings according to where in the sync cycle we are
-            switch (ecgSyncIteration % 3)
+            switch (ecgSyncSwitch)
             {
                 case 0:
                     // p at frame 12
@@ -145,13 +147,13 @@ public class HeartAniController : MonoBehaviour
                     break;
             }
 
-            
+            Debug.Log("Heart State: " + (ecgSyncIteration % 3).ToString() + " " + (heartCrossAni.GetCurrentAnimatorStateInfo(0).normalizedTime * 60).ToString() + " sync frames: " + syncFrames.ToString());
 
             // checks for missing values from the segmentation
 
 
             // otherwise this block searches for the next valid timing and ensure the coroutine wait for that duration
-            
+
             // setting flag for while loop
 
 
@@ -205,10 +207,10 @@ public class HeartAniController : MonoBehaviour
             cusp_state_flag = true;
         }
         //Debug.Log(bicuspidAni.GetCurrentAnimatorStateInfo(0).normalizedTime * 60);
-        //if ((float.Parse(syncTimings[cuspSyncIteration]) <= curr_time) || cusp_first_flag || (cusp_state_flag && (state < 0.1))) {
+        // if ((float.Parse(syncTimings[cuspSyncIteration]) <= curr_time) || cusp_first_flag )
         if ((cusp_state_flag && (state < 0.7)))
         {
-
+            
             // variables for synchronising animation
             cusp_state_flag = false;
 
@@ -242,18 +244,18 @@ public class HeartAniController : MonoBehaviour
             
             if ((state == 0) | ((state > 0.8) & state < 1.0))
             {
-                syncFrames = (( 0 -state) % 1 + 1) % 1 * 60 + 60;
+                syncFrames = (( 0 -state) % 1 + 1) % 1 * 60 + 60 - 10;
             }
             else
             {
-                syncFrames = ((0 -state) % 1 + 1) % 1 * 60;
+                syncFrames = ((0 -state) % 1 + 1) % 1 * 60 - 10;
             }
             syncSpeed = (syncFrames / timingDifference) / 60;
 
             tricuspidAni.speed = syncSpeed;
             bicuspidAni.speed = syncSpeed;
 
-            Debug.Log(state.ToString() + " " + syncFrames.ToString() + " " + syncSpeed.ToString());
+            Debug.Log("syncFrames: " + syncFrames.ToString() + " State: " + (state*60).ToString() + " speed: " + (syncSpeed*60).ToString() + " time differience :" + timingDifference.ToString());
 
             // if statement ensures the animation only starts playing after the first sync speed is calculated
             if (!bicuspidAni.enabled && !tricuspidAni.enabled)
