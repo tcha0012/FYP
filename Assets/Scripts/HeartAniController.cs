@@ -104,8 +104,8 @@ public class HeartAniController : MonoBehaviour
         ecgSyncFlag = false;
         int ecgSyncSwitch = ecgSyncIteration % 3;
         float state = heartCrossAni.GetCurrentAnimatorStateInfo(0).normalizedTime;
-        //if ((float.Parse(syncTimings[ecgSyncIteration]) <= curr_time) || (ecg_first_flag))
-        if ((((ecgSyncSwitch == 0) & (state > 0) & state < 0.4) | ((ecgSyncSwitch == 1) & (state > 0.2)) | ((ecgSyncSwitch == 2) & (state > 0.483333))) | ecg_first_flag)
+        if ((float.Parse(syncTimings[ecgSyncIteration]) <= curr_time) || (ecg_first_flag))
+        // if ((((ecgSyncSwitch == 2) & (state > 0) & state < 0.4) | ((ecgSyncSwitch == 0) & (state > 0.2)) | ((ecgSyncSwitch == 1) & (state > 0.483333))) || ecg_first_flag)
         {
 
             // variables for synchronising animation
@@ -116,21 +116,30 @@ public class HeartAniController : MonoBehaviour
 
             // first increment of iteration
             if (!ecg_first_flag) {
-            ecgSyncIteration++;
+                ecgSyncIteration++;
             }
-
+            ecgSyncSwitch = ecgSyncIteration % 3;
 
             ecg_first_flag = false;
             float next_timing = float.Parse(syncTimings[ecgSyncIteration]);
             // sets the sync frame and list of timings according to where in the sync cycle we are
-            switch (ecgSyncSwitch)
+            
+            switch (ecgSyncIteration % 3)
             {
                 case 0:
                     // p at frame 12
 
                     // syncFrames = 22;
                     // going from frame 50 to 12
-                    syncFrames = ((12.0f/60.0f - heartCrossAni.GetCurrentAnimatorStateInfo(0).normalizedTime)%1+1)%1 * 50f;
+                    if (state > 0.5)
+                    {
+                        syncFrames = 12.0f - state * 60f + 50;
+                    }
+                    else
+                    {
+                        syncFrames = 12.0f - state * 60f;
+                    }
+                    
 
                     firstBeatAudio.Play();
                     break;
@@ -138,17 +147,21 @@ public class HeartAniController : MonoBehaviour
                     // r at frame 29
                     // syncFrames = 17;
                     // going from current frame to frame 29
-                    syncFrames = ((29.0f/60.0f - heartCrossAni.GetCurrentAnimatorStateInfo(0).normalizedTime)%1+1)%1 * 50.0f;
+                    syncFrames = 29.0f - state * 60.0f;
                     break;
                 case 2:
                     // t at frame 50    
                     // syncFrames = 21;
-                    syncFrames = ((50.0f/60.0f - heartCrossAni.GetCurrentAnimatorStateInfo(0).normalizedTime)%1+1)%1 * 50.0f;
+
+
+                    syncFrames = 50.0f - state * 60.0f;
+
+                    
                     secondBeatAudio.Play();
                     break;
             }
 
-            Debug.Log("Heart State: " + (ecgSyncIteration % 3).ToString() + " " + (heartCrossAni.GetCurrentAnimatorStateInfo(0).normalizedTime * 60).ToString() + " sync frames: " + syncFrames.ToString());
+            
 
             // checks for missing values from the segmentation
 
@@ -164,6 +177,7 @@ public class HeartAniController : MonoBehaviour
             
             // set sync speed
             syncSpeed = (syncFrames / timingDifference) / 60;
+            Debug.Log("Heart State: " + (ecgSyncIteration % 3).ToString() + " " + (state*60).ToString() + " sync frames: " + syncFrames.ToString() + " curr_time : " + curr_time.ToString() + " speed: " + syncSpeed.ToString() + " time diff: " + timingDifference.ToString() + " next time: " + next_timing.ToString());
 
             //Debug.Log((ecgSyncIteration % 3).ToString() + " " + syncFrames.ToString() + " " + timingDifference.ToString() + " " + syncSpeed);
             heartCrossAni.speed = syncSpeed;
@@ -202,15 +216,14 @@ public class HeartAniController : MonoBehaviour
         cuspSyncFlag = false;
         List<string> syncTimings = cuspTimings.timingsList;
         float state = bicuspidAni.GetCurrentAnimatorStateInfo(0).normalizedTime;
-        Debug.Log(state.ToString());
         
         if (state > 0.7)
         {
             cusp_state_flag = true;
         }
         //Debug.Log(bicuspidAni.GetCurrentAnimatorStateInfo(0).normalizedTime * 60);
-        // if ((float.Parse(syncTimings[cuspSyncIteration]) <= curr_time) || cusp_first_flag )
-        if ((cusp_state_flag && (state < 0.7)))
+        if ((float.Parse(syncTimings[cuspSyncIteration]) <= curr_time) || cusp_first_flag )
+        // if ((cusp_state_flag && (state < 0.7)))
         {
             
             // variables for synchronising animation
@@ -244,14 +257,14 @@ public class HeartAniController : MonoBehaviour
             timingDifference = start_time + (next_timing) - curr_time;
             // set sync speed
             
-            if ((state == 0) | ((state > 0.8) & state < 1.0))
+            if ( state < 0.5)
             {
 
-                syncFrames = (( 0 -state) % 1 + 1) % 1 * 60 + 60 - 10;
+                syncFrames = 50 - state*60;
             }
             else
             {
-                syncFrames = ((0 -state) % 1 + 1) % 1 * 60 - 10;
+                syncFrames = 50 - state*60 + 50;
 
             }
             syncSpeed = (syncFrames / timingDifference) / 60;
@@ -259,7 +272,8 @@ public class HeartAniController : MonoBehaviour
             tricuspidAni.speed = syncSpeed;
             bicuspidAni.speed = syncSpeed;
 
-            Debug.Log("syncFrames: " + syncFrames.ToString() + " State: " + (state*60).ToString() + " speed: " + (syncSpeed*60).ToString() + " time differience :" + timingDifference.ToString());
+            //Debug.Log("cusp State: " + (state * 60).ToString() + " sync frames: " + syncFrames.ToString() + " curr_time : " + curr_time.ToString() + " speed: " + syncSpeed.ToString() + " time diff: " + timingDifference.ToString() + " next time: " + next_timing.ToString());
+
 
 
             // if statement ensures the animation only starts playing after the first sync speed is calculated
