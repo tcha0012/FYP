@@ -7,7 +7,6 @@ public class HeartAniController : MonoBehaviour
 {
     // references to each animator
     public Animator heartCrossAni;
-    // 
     public Animator bicuspidAni;
     public Animator tricuspidAni;
     public Animator rightSemiAni;
@@ -43,23 +42,7 @@ public class HeartAniController : MonoBehaviour
         ReadData("TestEcgData", ecgTimings);
         ReadData("TestCuspData", cuspTimings);
         ReadData("TestSlData", slTimings);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (ecgSyncFlag)
-        {
-            StartCoroutine(EcgAnimationSync());
-        }
-        if (cuspSyncFlag)
-        {
-            StartCoroutine(CuspAnimationSync());
-        }
-        if (slSyncFlag)
-        {
-            StartCoroutine(SlAnimationSync());
-        }
+        StartCoroutine(EcgAnimationSync());
     }
 
     // function that takes csv file and populates the timings container object
@@ -100,22 +83,28 @@ public class HeartAniController : MonoBehaviour
                 // p at frame 12
                 if (ecgSyncIteration != 0)
                 {
-                    syncFrames = 22;
+                    syncFrames = 20;
                 }
                 else
                 {
-                    syncFrames = 12;
+                    syncFrames = 10;
                 }
-                firstBeatAudio.Play();
+                // firstBeatAudio.Play();
                 break;
             case 1:
-                // r at frame 29
-                syncFrames = 17;
+                syncFrames = 10;
                 break;
             case 2:
-                // t at frame 50    
-                syncFrames = 21;
-                secondBeatAudio.Play();
+                syncFrames = 10;
+                // secondBeatAudio.Play();
+                break;
+            case 3:
+                syncFrames = 10;
+                // secondBeatAudio.Play();
+                break;
+            case 4:
+                syncFrames = 10;
+                // secondBeatAudio.Play();
                 break;
         }
 
@@ -127,6 +116,10 @@ public class HeartAniController : MonoBehaviour
             // sync frames divided by the timing gives the fps of the the animation divided by 60fps to derive the speed
             syncSpeed = (syncFrames / timingDifference) / 60;
             // sets the speed of the cross section
+            bicuspidAni.speed = syncSpeed;
+            tricuspidAni.speed = syncSpeed;
+            rightSemiAni.speed = syncSpeed;
+            leftSemiAni.speed = syncSpeed;
             heartCrossAni.speed = syncSpeed;
             // saves the values of current time for the next iteration
             ecgLastTiming = float.Parse(syncTimings[ecgSyncIteration]);
@@ -160,6 +153,10 @@ public class HeartAniController : MonoBehaviour
         // if statement ensures the animation only starts playing after the first sync speed is calculated
         if (!heartCrossAni.enabled)
         {
+            bicuspidAni.enabled = true;
+            tricuspidAni.enabled = true;
+            rightSemiAni.enabled = true;
+            leftSemiAni.enabled = true;
             heartCrossAni.enabled = true;
         }
 
@@ -173,173 +170,16 @@ public class HeartAniController : MonoBehaviour
         if ((ecgSyncIteration < ecgTimings.timingsList.Count - 1))
         {
             // sets flag to true for next iteration
-            ecgSyncFlag = true;
+            StartCoroutine(EcgAnimationSync());
         }
         else
         {
-            // disables animation
-            heartCrossAni.enabled = false;
-        }
-    }
-
-    IEnumerator CuspAnimationSync()
-    {
-        cuspSyncFlag = false;
-        // variables for synchronising animation
-        int syncFrames = 60;
-        float syncSpeed;
-        List<string> syncTimings = cuspTimings.timingsList;
-        float timingDifference;
-
-        // checks for missing values from the segmentation
-        if (syncTimings[cuspSyncIteration] != "NULL")
-        {
-            // calculates speed of animation based on sync timing
-            timingDifference = float.Parse(syncTimings[cuspSyncIteration]) - cuspLastTiming;
-            // sync frames divided by the timing gives the fps of the the animation divided by 60fps to derive the speed
-            syncSpeed = (syncFrames / timingDifference) / 60;
-            // sets the speed of the cross section
-            tricuspidAni.speed = syncSpeed;
-            bicuspidAni.speed = syncSpeed;
-            // saves the values of current time for the next iteration
-            cuspLastTiming = float.Parse(syncTimings[cuspSyncIteration]);
-        }
-        else
-        {
-            // otherwise this block searches for the next valid timing and ensure the coroutine wait for that duration
-            // first increment of iteration
-            cuspSyncIteration++;
-            // setting flag for while loop
-            bool whileFlag = false;
-            // initialise empty variable
-            string nextValidTiming = "";
-            // while loop that finds the next valid timing
-            while (!whileFlag)
-            {
-                nextValidTiming = syncTimings[cuspSyncIteration];
-                if (nextValidTiming != "NULL")
-                {
-                    whileFlag = true;
-                }
-                else
-                {
-                    cuspSyncIteration++;
-                }
-            }
-            // sets the appropraite wait time if the value is missing
-            timingDifference = float.Parse(nextValidTiming) - cuspLastTiming;
-        }
-
-        // if statement ensures the animation only starts playing after the first sync speed is calculated
-        if (!bicuspidAni.enabled && !tricuspidAni.enabled)
-        {
-            bicuspidAni.enabled = true;
-            tricuspidAni.enabled = true;
-        }
-
-        // increment iteration to track where in pqrst cycle we are
-        cuspSyncIteration++;
-
-        // waits until the we reach the timing specified for the current iteration before running again
-        yield return new WaitForSeconds(timingDifference);
-
-        // exit condition for the end of the data
-        if ((cuspSyncIteration < cuspTimings.timingsList.Count - 1))
-        {
-            // sets flag to true for next iteration
-            cuspSyncFlag = true;
-        }
-        else
-        {
-            // disables animation
             bicuspidAni.enabled = false;
             tricuspidAni.enabled = false;
-        }
-    }
-
-    IEnumerator SlAnimationSync()
-    {
-        slSyncFlag = false;
-        // variables for synchronising animation
-        int syncFrames = 0;
-        float syncSpeed;
-        List<string> syncTimings = slTimings.timingsList;
-        float timingDifference;
-
-        // sets the sync frame and list of timings according to where in the sync cycle we are
-        switch (slSyncIteration % 2)
-        {
-            case 0:
-                syncFrames = 26;
-                break;
-            case 1:
-                syncFrames = 34;
-                break;
-        }
-
-        // checks for missing values from the segmentation
-        if (syncTimings[slSyncIteration] != "NULL")
-        {
-            // calculates speed of animation based on sync timing
-            timingDifference = float.Parse(syncTimings[slSyncIteration]) - slLastTiming;
-            // sync frames divided by the timing gives the fps of the the animation divided by 60fps to derive the speed
-            syncSpeed = (syncFrames / timingDifference) / 60;
-            // sets the speed of the cross section
-            rightSemiAni.speed = syncSpeed;
-            leftSemiAni.speed = syncSpeed;
-            // saves the values of current time for the next iteration
-            slLastTiming = float.Parse(syncTimings[slSyncIteration]);
-        }
-        else
-        {
-            // otherwise this block searches for the next valid timing and ensure the coroutine wait for that duration
-            // first increment of iteration
-            slSyncIteration++;
-            // setting flag for while loop
-            bool whileFlag = false;
-            // initialise empty variable
-            string nextValidTiming = "";
-            // while loop that finds the next valid timing
-            while (!whileFlag)
-            {
-                nextValidTiming = syncTimings[slSyncIteration];
-                if (nextValidTiming != "NULL")
-                {
-                    whileFlag = true;
-                }
-                else
-                {
-                    slSyncIteration++;
-                }
-            }
-            // sets the appropraite wait time if the value is missing
-            timingDifference = float.Parse(nextValidTiming) - slLastTiming;
-        }
-
-        // if statement ensures the animation only starts playing after the first sync speed is calculated
-        if (!rightSemiAni.enabled && !leftSemiAni.enabled)
-        {
-            rightSemiAni.enabled = true;
-            leftSemiAni.enabled = true;
-        }
-
-        // increment iteration to track where in pqrst cycle we are
-        slSyncIteration++;
-
-        // waits until the we reach the timing specified for the current iteration before running again
-        yield return new WaitForSeconds(timingDifference);
-
-        // exit condition for the end of the data
-        if ((slSyncIteration < slTimings.timingsList.Count - 1))
-        {
-            // sets flag to true for next iteration
-            slSyncFlag = true;
-        }
-        else
-        {
-            // disables animation
             rightSemiAni.enabled = false;
             leftSemiAni.enabled = false;
+            heartCrossAni.enabled = false;
+            yield return null;
         }
     }
 }
