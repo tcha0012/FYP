@@ -116,7 +116,7 @@ public class HeartAniController : MonoBehaviour
         // increment iteration to track where in pqrst cycle we are
         ecgSyncIteration++;
 
-        Debug.Log(Time.time + " " + syncTimings[ecgSyncIteration]);
+        // Debug.Log(Time.time + " " + syncTimings[ecgSyncIteration]);
         // waits until the we reach the timing specified for the current iteration before running again
         float parsedTiming = float.Parse(syncTimings[ecgSyncIteration]);
         if (Time.time > parsedTiming)
