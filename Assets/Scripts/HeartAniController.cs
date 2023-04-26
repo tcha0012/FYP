@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class HeartAniController : MonoBehaviour
 {
+    public GameEngine gameEngine;
     // references to each animator
     public Animator heartCrossAni;
     public Animator bicuspidAni;
@@ -18,6 +19,8 @@ public class HeartAniController : MonoBehaviour
 
     // container for the list of timings
     private TimingsContainer ecgTimings = new TimingsContainer();
+    // time at which animation starts
+    private float startTime;
 
     // variables for coroutine that need to be held between runs
     // position in the sync cycle
@@ -25,11 +28,16 @@ public class HeartAniController : MonoBehaviour
     // the timing for the previous iteration
     private float ecgLastTiming = 0;
 
-    // Start is called before the first frame update
-    void Start()
+    // starts the actual animation
+    public void StartAnimation()
     {
+        // reset all related attributes
+        ecgTimings = new TimingsContainer();
+        ecgSyncIteration = 0;
+        ecgLastTiming = 0;
         // populates each timings container object
         ReadData("all_timings", ecgTimings);
+        startTime = Time.time;
         StartCoroutine(EcgAnimationSync());
     }
 
@@ -57,6 +65,7 @@ public class HeartAniController : MonoBehaviour
 
     IEnumerator EcgAnimationSync()
     {
+
         // variables for synchronising animation
         int syncFrames = 0;
         float syncSpeed;
@@ -119,9 +128,11 @@ public class HeartAniController : MonoBehaviour
         // Debug.Log(Time.time + " " + syncTimings[ecgSyncIteration]);
         // waits until the we reach the timing specified for the current iteration before running again
         float parsedTiming = float.Parse(syncTimings[ecgSyncIteration]);
-        if (Time.time > parsedTiming)
+        // accounts for race condition
+        float adjustedTime = Time.time - startTime;
+        if (adjustedTime > parsedTiming)
         {
-            yield return new WaitForSeconds(timingDifference - (Time.time - parsedTiming));
+            yield return new WaitForSeconds(timingDifference - (adjustedTime - parsedTiming));
         }
         else
         {
@@ -131,16 +142,19 @@ public class HeartAniController : MonoBehaviour
         // exit condition for the end of the data
         if ((ecgSyncIteration < ecgTimings.timingsList.Count - 1))
         {
+            // continues
             StartCoroutine(EcgAnimationSync());
             yield return null;
         }
         else
         {
+            // ends animation
             bicuspidAni.enabled = false;
             tricuspidAni.enabled = false;
             rightSemiAni.enabled = false;
             leftSemiAni.enabled = false;
             heartCrossAni.enabled = false;
+            gameEngine.EndAni();
             yield return null;
         }
     }

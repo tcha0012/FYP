@@ -20,7 +20,6 @@ public class EcgLineRenderer : MonoBehaviour
 
     private TimingsContainer lineTimings = new TimingsContainer();
     private int valueIndex = 0;
-    private bool runningFlag = true;
 
     // Called when application or editor opens
     void Awake()
@@ -46,15 +45,24 @@ public class EcgLineRenderer : MonoBehaviour
         lineRenderer.enabled = false;
     }
 
-    private void Start()
+    public void StartLine()
     {
+        valueIndex = 0;
+        // adjust here and line 122 for time between points
         InvokeRepeating("DrawLine", 0.0f, 0.002f);
     }
 
     void DrawLine()
     {
-        AddPoint(float.Parse(lineTimings.timingsList[valueIndex]));
-        valueIndex++;
+        if (valueIndex < lineTimings.timingsList.Count)
+        {
+            AddPoint(float.Parse(lineTimings.timingsList[valueIndex]));
+            valueIndex++;
+        }
+        else
+        {
+            CancelInvoke();
+        }
     }
 
     // Initializes line and transform components
