@@ -2,9 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using PCG_segmentation;
+
 
 public class HeartAniController : MonoBehaviour
 {
+
+    
+    public string FinalPath;
+
     public GameEngine gameEngine;
     // references to each animator
     public Animator heartCrossAni;
@@ -28,17 +34,57 @@ public class HeartAniController : MonoBehaviour
     // the timing for the previous iteration
     private float ecgLastTiming = 0;
 
+    public List<string> syncTimings = new List<string>();
+
     // starts the actual animation
     public void StartAnimation()
     {
+
+        // We need to call a function to get the csv file
+        /*
+        Debug.Log(FileBrowser.WaitForLoadDialog(FileBrowser.PickMode.FilesAndFolders, true, null, null, "Load Files and Folders", "Load"));
+        if (FileBrowser.Success) 
+        {
+            Debug.Log("file browser was successful");
+        }
+        else
+        {
+            Debug.Log("file browser was unsuccessful");
+        }
+        */
+        LoadFile();
+        string file_location = FinalPath;
+
+        (List<double> R_timings, List<double> T_timings, List<double> S1_timings, List<double> S2_timings) = Segment_data.segment_data(file_location, 100, 8000);
+        
+        //Debug.Log(Convert.ToString(R_timings.Count());
+        
         // reset all related attributes
-        ecgTimings = new TimingsContainer();
+        //ecgTimings = new TimingsContainer();
         ecgSyncIteration = 0;
         ecgLastTiming = 0;
         // populates each timings container object
+        syncTimings.Clear();
+        ReadDataList(syncTimings, R_timings, T_timings, S1_timings, S2_timings);
         ReadData("all_timings", ecgTimings);
         startTime = Time.time;
         StartCoroutine(EcgAnimationSync());
+    }
+
+    private void ReadDataList(List<string> syncTimings, List<double> R_timings, List<double> T_timings, List<double> S1_timings, List<double> S2_timings)
+    {
+        TimingsContainer timings = new TimingsContainer();
+        for (int i = 0; i < R_timings.Count; i++)
+        {
+            
+            syncTimings.Add(Convert.ToString(R_timings[i]));
+            syncTimings.Add(Convert.ToString(S1_timings[i]));
+            syncTimings.Add(Convert.ToString(T_timings[i]));
+            syncTimings.Add(Convert.ToString(S2_timings[i]));
+            
+        }
+
+        
     }
 
     // function that takes csv file and populates the timings container object
@@ -65,34 +111,31 @@ public class HeartAniController : MonoBehaviour
 
     IEnumerator EcgAnimationSync()
     {
-
         // variables for synchronising animation
         int syncFrames = 0;
         float syncSpeed;
-        List<string> syncTimings = ecgTimings.timingsList;
+        //List<string> syncTimings = ecgTimings.timingsList;
+        
         float timingDifference;
 
         // sets the sync frame and list of timings according to where in the sync cycle we are
-        switch (ecgSyncIteration % 5)
+        switch (ecgSyncIteration % 4)
         {
             case 0:
-                // p at frame 12
+                // r at frame 12
                 syncFrames = 12;
-                firstBeatAudio.Play();
+                
                 break;
             case 1:
-                // s at frame 22
-                syncFrames = 10;
+                // s1 at frame 26
+                syncFrames = 14;
+                firstBeatAudio.Play();
                 break;
             case 2:
-                // s1 at frame 26
-                syncFrames = 4;
-                break;
-            case 3:
                 // t at frame 45
                 syncFrames = 19;
                 break;
-            case 4:
+            case 3:
                 // s2 at frame 0
                 syncFrames = 5;
                 secondBeatAudio.Play();
@@ -140,7 +183,7 @@ public class HeartAniController : MonoBehaviour
         }
 
         // exit condition for the end of the data
-        if ((ecgSyncIteration < ecgTimings.timingsList.Count - 1))
+        if ((ecgSyncIteration < syncTimings.Count - 1))
         {
             // continues
             StartCoroutine(EcgAnimationSync());
@@ -157,5 +200,21 @@ public class HeartAniController : MonoBehaviour
             gameEngine.EndAni();
             yield return null;
         }
+    }
+
+    public void LoadFile()
+    {
+        string FileType = NativeFilePicker.ConvertExtensionToFileType("*");
+        NativeFilePicker.Permission permission = NativeFilePicker.PickFile((path) =>
+        {
+            if (path == null)
+                Debug.Log("Operation cancelled");
+            else
+            {
+                FinalPath = path;
+                Debug.Log("Picked file: " + FinalPath);
+            }
+
+        }, new string[] { FileType });
     }
 }
