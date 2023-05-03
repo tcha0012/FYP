@@ -205,6 +205,7 @@ public class HeartAniController : MonoBehaviour
     public void LoadFile()
     {
         string FileType = NativeFilePicker.ConvertExtensionToFileType("*");
+        string[] fileTypes = new string[] { "application/*", "video/*", "documents/*" , "text/*"};
         NativeFilePicker.Permission permission = NativeFilePicker.PickFile((path) =>
         {
             if (path == null)
@@ -215,6 +216,6 @@ public class HeartAniController : MonoBehaviour
                 Debug.Log("Picked file: " + FinalPath);
             }
 
-        }, new string[] { FileType });
+        }, fileTypes);
     }
 }
