@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 [RequireComponent(typeof(RectTransform))]
 public class EcgLineRenderer : MonoBehaviour
@@ -20,6 +21,8 @@ public class EcgLineRenderer : MonoBehaviour
 
     private TimingsContainer lineTimings = new TimingsContainer();
     private int valueIndex = 0;
+
+    public List<double> ECG_data = new List<double>();
 
     // Called when application or editor opens
     void Awake()
@@ -45,6 +48,50 @@ public class EcgLineRenderer : MonoBehaviour
         lineRenderer.enabled = false;
     }
 
+    public void prepare(string path)
+    {
+        List<double> ECG_500 = getECG(path, 60, 8000, 500);
+
+    }
+
+    public List<double> getECG(string path, double length, int Fs, int output_Fs)
+    {
+        using (var reader = new StreamReader(path))
+        {
+            List<double> indexes = new List<double>();
+            List<double> timings = new List<double>();
+            List<double> ECG = new List<double>();
+            List<double> PCG = new List<double>();
+
+            int i = 0;
+            bool first_row_flag = true;
+            while ((!reader.EndOfStream) && (i < Convert.ToInt32(Convert.ToDouble(Fs) * length)))
+            {
+
+                var line = reader.ReadLine();
+                var values = line.Split(';', ',');
+
+                if (!first_row_flag)
+                {
+                    indexes.Add(Convert.ToInt32(values[0]));
+                    timings.Add(Convert.ToDouble(values[1]));
+                    ECG.Add(Convert.ToDouble(values[2]));
+                    PCG.Add(Convert.ToDouble(values[3]));
+                }
+                first_row_flag = false;
+                i++;
+            }
+
+            List<double> ECG_500 = new List<double>();
+            for (int j = 0; j < (Fs / output_Fs); j++)
+            {
+                ECG_500.Add(j * (Fs / output_Fs));
+            }
+
+            return ECG_500;
+        }
+    }
+
     public void StartLine()
     {
         valueIndex = 0;
@@ -54,9 +101,24 @@ public class EcgLineRenderer : MonoBehaviour
 
     void DrawLine()
     {
+
         if (valueIndex < lineTimings.timingsList.Count)
         {
             AddPoint(float.Parse(lineTimings.timingsList[valueIndex]));
+            valueIndex++;
+        }
+        else
+        {
+            CancelInvoke();
+        }
+    }
+
+    void DrawLine2()
+    {
+
+        if (valueIndex < ECG_data.Count)
+        {
+            AddPoint((ECG_data[valueIndex]));
             valueIndex++;
         }
         else
