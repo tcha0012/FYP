@@ -56,7 +56,7 @@ public class HeartAniController : MonoBehaviour
         LoadFile();
         string file_location = FinalPath;
 
-        (List<double> R_timings, List<double> T_timings, List<double> S1_timings, List<double> S2_timings) = Segment_data.segment_data(file_location, 100, 8000);
+        (List<double> R_timings, List<double> T_timings, List<double> S1_timings, List<double> S2_timings) = Segment_data.segment_data(file_location, 20, 8000);
         
         //Debug.Log(Convert.ToString(R_timings.Count());
         
@@ -218,6 +218,8 @@ public class HeartAniController : MonoBehaviour
         timingDifference = float.Parse(syncTimings[ecgSyncIteration]) + startTime - curr_time;
         // sync frames divided by the timing gives the fps of the the animation divided by 60fps to derive the speed
         syncSpeed = (syncFrames / timingDifference) / 60;
+        Debug.Log("start time: " + Convert.ToString(startTime));
+        Debug.Log("syncspeed: " + Convert.ToString(syncSpeed));
         // sets the speed of the cross section
         bicuspidAni.speed = syncSpeed;
         tricuspidAni.speed = syncSpeed;

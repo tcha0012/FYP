@@ -49,20 +49,25 @@ namespace PCG_segmentation
             List<double> processed_data = new List<double>();
             PCG_methods.get_hr_preprocessing(processed_data, PCG, source_Fs, new_Fs);
 
+            if (figures)
+            {
+                Viterbi_Springer.PlotData(processed_data, new_Fs, "PCG amplitude", "time (s)", "Pre-processed PCG data", @"C:\github\PCG_Segmentation\PCG_segmentation\plots\preprocessed_PCG.png");
+            }
+
             (List<double> psd, int cut_data) = Viterbi_Springer.get_PSD_feature_Springer_HMM(processed_data, new_Fs, 40, 60);
             if (figures)
             {
-                Viterbi_Springer.PlotData(psd, 1, "amplitude", @"C:\github\PCG_Segmentation\PCG_segmentation\plots\psd.png");
+                Viterbi_Springer.PlotData(psd, new_Fs, "PSD amplitude", "time (s)", "Power spectral density", @"C:\github\PCG_Segmentation\PCG_segmentation\plots\psd.png");
 
             }
             PCG_methods.normalise_signal(psd);
             if (figures)
             {
-                Viterbi_Springer.PlotData(psd, 1, "amplitude", @"C:\github\PCG_Segmentation\PCG_segmentation\plots\normalised_psd.png");
+                Viterbi_Springer.PlotData(psd, new_Fs, "normalised PSD amplitude", "time (s)", "Normalised power spectral density", @"C:\github\PCG_Segmentation\PCG_segmentation\plots\normalised_psd.png");
 
             }
 
-            int down_sampled_Fs = 150;
+            int down_sampled_Fs = 50;
             int down_sampled_length = Convert.ToInt32(Convert.ToDouble(down_sampled_Fs) / Convert.ToDouble(new_Fs) * Convert.ToDouble(processed_data.Count()));
             List<double> psd_down_sampled = Viterbi_Springer.Resample(psd, down_sampled_length);
 
@@ -71,11 +76,11 @@ namespace PCG_segmentation
             //List<double> cropped_processed_PCG = PCG_methods.crop_data(processed_data, new_Fs, cut_data, new_Fs);
 
             List<double> PCG_down_sampled = Viterbi_Springer.Resample(processed_data, down_sampled_length);
-
-            (List<double> peak_indices, List<double> peak_values) =  PCG_methods.Noisy_Peak_Finding(psd_down_sampled, 5, 0);
+            // psd_down_sampled = PCG_methods.smooth_data(psd_down_sampled, 5);
+            (List<double> peak_indices, List<double> peak_values) = PCG_methods.Noisy_Peak_Finding(psd_down_sampled, 5, 0);
             if (figures)
             {
-                Viterbi_Springer.MultiPlot(psd_down_sampled, peak_indices, peak_values, @"C:\github\PCG_Segmentation\PCG_segmentation\plots\Peaks.png");
+                Viterbi_Springer.MultiPlot(psd_down_sampled, peak_indices, peak_values, 50.0, "Normalised PSD amplitude", "time (s)", "Detected S peaks", "psd", "S peaks", @"C:\github\PCG_Segmentation\PCG_segmentation\plots\Peaks.png");
             }
 
 
@@ -83,7 +88,7 @@ namespace PCG_segmentation
 
             if (figures)
             {
-                Viterbi_Springer.MultiPlot(psd_down_sampled, S_indices, S_Amplitudes, @"C:\github\PCG_Segmentation\PCG_segmentation\plots\Peaks_after_post_processing.png");
+                Viterbi_Springer.MultiPlot(psd_down_sampled, S_indices, S_Amplitudes, 50.0, "Normalised PSD amplitude", "time (s)", "Detected S peaks after processing", "psd", "S peaks", @"C:\github\PCG_Segmentation\PCG_segmentation\plots\Peaks_after_post_processing.png");
             }
             //Viterbi_Springer.TriplePlot(psd_down_sampled, S1_indexes, S1_Amplitudes, S2_indexes, S2_Amplitudes, @"C:\github\PCG_Segmentation\PCG_segmentation\plots\S1_S2_segmentation.png");
 
@@ -102,9 +107,16 @@ namespace PCG_segmentation
             // ECG Segmentation
             if (figures)
             {
-                Viterbi_Springer.PlotData(ECG, 1, "amplitude", @"C:\github\PCG_Segmentation\PCG_segmentation\plots\Raw_ECG.png");
+                Viterbi_Springer.PlotData(ECG, source_Fs, "ECGamplitude", "time (s)", "Raw ECG data", @"C:\github\PCG_Segmentation\PCG_segmentation\plots\Raw_ECG.png");
             }
 
+
+
+
+            // Testing Pan tonkins
+
+            List<double> QRS_indices = ECG_methods.PanTompkin(ECG, source_Fs, figures);
+            QRS_indices = ECG_methods.change_timing_freq(QRS_indices, 200, source_Fs);
 
             // Cleaning data
             List<double> cleaned_ECG = ECG_methods.ecg_clean(ECG, source_Fs);
@@ -135,7 +147,7 @@ namespace PCG_segmentation
 
             if (figures)
             {
-                Viterbi_Springer.PlotData(smoothed_signal, 1, "amplitude", @"C:\github\PCG_Segmentation\PCG_segmentation\plots\smoothed_signal.png");
+                Viterbi_Springer.PlotData(smoothed_signal, source_Fs, "ECG amplitude", "time (s)", "Smoothed and filtered ECG data for T wave detection", @"C:\github\PCG_Segmentation\PCG_segmentation\plots\smoothed_signal.png");
             }
 
             // Remove the R peak so they dont interfere with peak finding of P 
@@ -145,11 +157,13 @@ namespace PCG_segmentation
             {
                 R_window += 1;
             }
-            List<double> smoothed_signal_without_R = ECG_methods.Remove_R_Peaks(smoothed_signal, R_indices, R_window);
+            List<double> smoothed_signal_without_R = ECG_methods.Remove_R_Peaks(smoothed_signal, QRS_indices, R_window);
 
+            PCG_methods.normalise_signal(smoothed_signal_without_R);
+            smoothed_signal_without_R = ECG_methods.Remove_R_Peaks(smoothed_signal_without_R, QRS_indices, R_window);
             if (figures)
             {
-                Viterbi_Springer.PlotData(smoothed_signal_without_R, 1, "amplitude", @"C:\github\PCG_Segmentation\PCG_segmentation\plots\no_R.png");
+                Viterbi_Springer.PlotData(smoothed_signal_without_R, source_Fs, "ECG amplitude", "time (s)", "Smoothed and filtered ECG data with QRS peaks nullified", @"C:\github\PCG_Segmentation\PCG_segmentation\plots\no_R.png");
             }
 
             // Use peak finding to identify the T wave
@@ -158,8 +172,10 @@ namespace PCG_segmentation
 
             if (figures)
             {
-                Viterbi_Springer.MultiPlot(smoothed_signal_without_R, T_indices, T_values, @"C:\github\PCG_Segmentation\PCG_segmentation\plots\T_peaks.png");
+                Viterbi_Springer.MultiPlot(smoothed_signal_without_R, T_indices, T_values, source_Fs, "ECG amplitude", "time (s)", "Identified T peaks on ECG signal", "ECG signal", "T peaks", @"C:\github\PCG_Segmentation\PCG_segmentation\plots\T_peaks.png");
             }
+
+            T_indices = ECG_methods.shift_T_timings(T_indices);
 
 
             List<double> S_timings = PCG_methods.samples2Timings(S_indices, down_sampled_Fs);
@@ -167,10 +183,36 @@ namespace PCG_segmentation
             //List<double> S2_timings = PCG_methods.samples2Timings(S2_indexes, down_sampled_Fs);
             List<double> pre_T_timings = PCG_methods.samples2Timings(T_indices, source_Fs);
             List<double> pre_R_timings = PCG_methods.samples2Timings(R_indices, source_Fs);
+            List<double> pre_QRS_timings = PCG_methods.samples2Timings(QRS_indices, source_Fs);
 
-            
 
-            (List<double> R_timings, List<double> T_timings, List<double> S1_timings, List<double> S2_timings) = ECG_methods.post_processing(pre_R_timings, pre_T_timings, S_timings);
+
+            if (figures)
+            {
+                List<double> S_peaks = new List<double>();
+                List<double> S_1000_indices = new List<double>();
+                for (int i = 0; i < S_timings.Count(); i++)
+                {
+                    S_1000_indices.Add(S_timings[i] * 1000.0);
+                    S_peaks.Add(processed_data[Convert.ToInt32(S_timings[i] * 1000.0)]);
+                }
+
+                Viterbi_Springer.MultiPlot(processed_data, S_1000_indices, S_peaks, 1000, "amplitude", "time (s)", "S timings on cleaned PCG", "PCG", "S peaks", @"C:\github\PCG_Segmentation\PCG_segmentation\plots\S1_S2_compare.png");
+
+            }
+
+
+
+            (List<double> R_timings, List<double> T_timings, List<double> S1_timings, List<double> S2_timings) = ECG_methods.post_processing(pre_QRS_timings, pre_T_timings, S_timings, figures);
+
+            //List<double> edr = EDR.compute(R_timings, cleaned_ECG, source_Fs);
+            //if (figures)
+            //{
+            //   Viterbi_Springer.PlotData(edr, 1, "EDR", @"C:\github\PCG_Segmentation\PCG_segmentation\plots\EDR.png");
+            //}
+
+
+
 
 
             if (save_output)
@@ -183,7 +225,10 @@ namespace PCG_segmentation
 
             if (figures)
             {
+                PCG_methods.normalise_signal(ECG);
+                Viterbi_Springer.MultiPlot(smoothed_signal_without_R, cleaned_ECG, @"C:\github\PCG_Segmentation\PCG_segmentation\plots\cleaned_vs_raw_ECG_Compare.png");
                 ECG_methods.plot_all_timings(R_timings, T_timings, S1_timings, S2_timings, ECG, PCG, source_Fs);
+
             }
 
             return (R_timings, T_timings, S1_timings, S2_timings);

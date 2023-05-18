@@ -16,16 +16,27 @@ namespace PCG_segmentation
 
         public static void PlotData(List<double> data, double samplingFrequency, string ylabel, string filepath)
         {
-            var plt = new Plot(800, 600);
+            var plt = new Plot(800*2, 600);
             plt.AddSignal(data.ToArray(), samplingFrequency);
             plt.YLabel(ylabel);
             plt.Margins(0);
             plt.SaveFig(filepath);
         }
 
+        public static void PlotData(List<double> data, double samplingFrequency, string ylabel, string xlabel, string title, string filepath)
+        {
+            var plt = new Plot(800*2, 600);
+            plt.AddSignal(data.ToArray(), samplingFrequency);
+            plt.YLabel(ylabel);
+            plt.Title(title);
+            plt.XLabel(xlabel);
+            plt.Margins(0);
+            plt.SaveFig(filepath);
+        }
+
         public static void MultiPlot(List<double> data1, List<double> data2X, List<double> data2Y, string filepath)
         {
-            var plt = new Plot(800, 600);
+            var plt = new Plot(800*2, 600);
             var mySignalPlot1 = plt.AddSignal(data1.ToArray());
             mySignalPlot1.YAxisIndex = 0;
             mySignalPlot1.XAxisIndex = 0;
@@ -37,23 +48,50 @@ namespace PCG_segmentation
             plt.SaveFig(filepath);
         }
 
-        public static void MultiPlot(List<double> data1, List<double> data2, string filepath)
+        public static void MultiPlot(List<double> data1, List<double> data2X, List<double> data2Y, double samplingFrequency, string ylabel, string xlabel, string title, string legend1, string legend2, string filepath)
         {
-            var plt = new Plot(800, 600);
-            var mySignalPlot1 = plt.AddSignal(data1.ToArray());
+            var plt = new Plot(800*2, 600);
+            var mySignalPlot1 = plt.AddSignal(data1.ToArray(), samplingFrequency, label: legend1);
             mySignalPlot1.YAxisIndex = 0;
             mySignalPlot1.XAxisIndex = 0;
 
-            var mySignalPlot2 = plt.AddSignal(data2.ToArray());
+            List<double> data2X2 = new List<double>();
+
+            for (int i = 0; i < data2X.Count(); i++)
+            {
+                data2X2.Add(data2X[i] / Convert.ToDouble(samplingFrequency));
+            }
+
+            var mySignalPlot2 = plt.PlotScatter(data2X2.ToArray(), data2Y.ToArray(), label: legend2);
             mySignalPlot2.YAxisIndex = 0;
             mySignalPlot2.XAxisIndex = 0;
+            plt.YLabel(ylabel);
+            plt.Title(title);
+            plt.XLabel(xlabel);
+            plt.Legend();
 
+
+
+            plt.SaveFig(filepath);
+        }
+
+        public static void MultiPlot(List<double> data1, List<double> data2, string filepath)
+        {
+            var plt = new Plot(800*10, 600);
+            var mySignalPlot1 = plt.AddSignal(data1.ToArray(), label: "1");
+            mySignalPlot1.YAxisIndex = 0;
+            mySignalPlot1.XAxisIndex = 0;
+
+            var mySignalPlot2 = plt.AddSignal(data2.ToArray(), label: "2");
+            mySignalPlot2.YAxisIndex = 0;
+            mySignalPlot2.XAxisIndex = 0;
+            plt.Legend();
             plt.SaveFig(filepath);
         }
 
         public static void TriplePlot(List<double> data1, List<double> data2X, List<double> data2Y, List<double> data3X, List<double>data3Y, string filepath)
         {
-            var plt = new Plot(800, 600);
+            var plt = new Plot(800*2, 600);
             var mySignalPlot1 = plt.AddSignal(data1.ToArray());
             mySignalPlot1.YAxisIndex = 0;
             mySignalPlot1.XAxisIndex = 0;
@@ -86,7 +124,7 @@ namespace PCG_segmentation
 
             for (int i = 0; i < outputLength; i++)
             {
-                double index = i * (inputList.Count - 1) / (double)(outputLength - 1);
+                double index = i * ((inputList.Count) / (double)(outputLength));
 
                 int lowerIndex = (int)Math.Floor(index);
                 int upperIndex = (int)Math.Ceiling(index);

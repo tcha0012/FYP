@@ -19,7 +19,7 @@ namespace PCG_segmentation
                 
                 int i = 0;
                 bool first_row_flag = true;
-                while ((!reader.EndOfStream) && (i < Convert.ToInt32(Convert.ToDouble(Fs) * length)))
+                while ((!reader.EndOfStream) && (i <= Convert.ToInt32(Convert.ToDouble(Fs) * length)))
                 {
                     var line = reader.ReadLine();
                     var values = line.Split(';', ',');
@@ -152,7 +152,7 @@ namespace PCG_segmentation
             }
 
             // save_to_csv(filtered_audiofile, @"C:\github\PCG_Segmentation\filtered_data.csv");
-            // Viterbi_Springer.PlotData(filtered_audiofile, 1, "amplitude", @"C:\github\PCG_Segmentation\PCG_segmentation\plots\filtered_data.png");
+            // Viterbi_Springer.PlotData(filtered_audiofile, 1000, "PCG_amplitude", "time (s)", "PCG with 25-400 Hz bandpass filter", @"C:\github\PCG_Segmentation\PCG_segmentation\plots\PCG_bandpass.png");
 
 
             // Spike removal
@@ -695,7 +695,7 @@ namespace PCG_segmentation
         public static (List<double>, List<double>s) Noisy_Peak_Finding(List<double> input, int num_smooth, double threshold)
         {
             
-            //input = smooth_data(input, num_smooth);
+            //input = smooth_data(input, 10);
 
             //PCG_methods.save_to_csv(smoothed_signal, @"C:\github\PCG_Segmentation\smoothed_signal.csv");
             //PCG_methods.save_to_csv(input, @"C:\github\PCG_Segmentation\input_to_.csv");
@@ -704,6 +704,9 @@ namespace PCG_segmentation
 
             List<double> peakIndices = new List<double>();
             List<double> peakValues = new List<double>();
+            
+
+            
 
             double peak_Value = double.MinValue;
             int peak_Index = int.MinValue;
@@ -767,7 +770,7 @@ namespace PCG_segmentation
                     input_Y.RemoveAt(i + 1);
                 }
             }
-
+            /*
             for (int i = 0; i < input.Count() - 1; i++)
             {
                 if (input_Y[i] > input_Y[i + 1])
@@ -794,6 +797,7 @@ namespace PCG_segmentation
                 
                 S2_Amplitudes.Add(input_Y[input.Count() - 1]);
             }
+            */
 
             return (input, input_Y);
         }
