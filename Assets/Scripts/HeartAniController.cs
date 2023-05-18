@@ -27,13 +27,14 @@ public class HeartAniController : MonoBehaviour
     private TimingsContainer ecgTimings = new TimingsContainer();
     // time at which animation starts
     private float startTime;
+    public float curr_time = 0f;
 
     // variables for coroutine that need to be held between runs
     // position in the sync cycle
     private int ecgSyncIteration = 0;
     // the timing for the previous iteration
     private float ecgLastTiming = 0;
-
+    bool first_flag = true;
     public List<string> syncTimings = new List<string>();
 
     // starts the actual animation
@@ -112,23 +113,93 @@ public class HeartAniController : MonoBehaviour
     IEnumerator EcgAnimationSync()
     {
         // variables for synchronising animation
-        int syncFrames = 0;
+        float syncFrames = 0f;
         float syncSpeed;
         //List<string> syncTimings = ecgTimings.timingsList;
         
         float timingDifference;
+        Debug.Log(bicuspidAni.GetCurrentAnimatorStateInfo(0).normalizedTime % 1);
 
         // sets the sync frame and list of timings according to where in the sync cycle we are
+
+        // get current state and time
+        float curr_state = (bicuspidAni.GetCurrentAnimatorStateInfo(0).normalizedTime % 1) * 50f;
+        curr_time = Time.time;
+        Debug.Log("current time = " + Convert.ToString(curr_time));
+        //float frame = 20f
+        //float desired_state = frame / 50f;
+
+        //Debug.Log(curr_state * 50f);
+        //Debug.Log(Math.Abs(curr_state - desired_state));
+        /*
+        if (Math.Abs(curr_state - desired_state) < 0.00)
+        {
+            
+            syncFrames = 0;
+        }
+        else
+        {
+            syncFrames = 10;
+        }
+        */
+        
+
+        // get the desired state
         switch (ecgSyncIteration % 4)
         {
             case 0:
-                // r at frame 12
-                syncFrames = 12;
+                // r at frame 30
+                if (first_flag)
+                {
+                    // syncFrames = 10;
+                    syncFrames = 30f - curr_state;
+                    if (syncFrames < 0f) syncFrames = syncFrames + 50f;
+                    first_flag = false;
+                }
+                else
+                {
+                    syncFrames = 30f - curr_state;
+                    if (syncFrames < 0f) syncFrames = syncFrames + 50f;
+                    // syncFrames = 30;
+                }
+                
+
+                break;
+            case 1:
+                // S1 at frame 42
+                 // syncFrames = 12;
+                syncFrames = 42f - curr_state;
+                if (syncFrames < 0f) syncFrames = syncFrames + 50f;
+                firstBeatAudio.Play();
+                break;
+            case 2:
+                // t at frame 6
+                //syncFrames = 14;
+
+                syncFrames = 6f - curr_state;
+                if (syncFrames < 0f) syncFrames = syncFrames + 50f;
+                break;
+            case 3:
+                // s2 at frame 20
+                syncFrames = 14f;
+
+                syncFrames = 20f - curr_state;
+                if (syncFrames < 0f) syncFrames = syncFrames + 50f;
+                secondBeatAudio.Play();
+                break;
+        }
+
+        /*
+        switch (ecgSyncIteration % 4)
+        {
+            case 0:
+                // r at frame 22
+                syncFrames = 22;
                 
                 break;
             case 1:
                 // s1 at frame 26
-                syncFrames = 14;
+                syncFrames = 4;
                 firstBeatAudio.Play();
                 break;
             case 2:
@@ -141,9 +212,10 @@ public class HeartAniController : MonoBehaviour
                 secondBeatAudio.Play();
                 break;
         }
-
+        */
         // calculates speed of animation based on sync timing
-        timingDifference = float.Parse(syncTimings[ecgSyncIteration]) - ecgLastTiming;
+        // timingDifference = float.Parse(syncTimings[ecgSyncIteration]) - ecgLastTiming;
+        timingDifference = float.Parse(syncTimings[ecgSyncIteration]) + startTime - curr_time;
         // sync frames divided by the timing gives the fps of the the animation divided by 60fps to derive the speed
         syncSpeed = (syncFrames / timingDifference) / 60;
         // sets the speed of the cross section
@@ -200,6 +272,10 @@ public class HeartAniController : MonoBehaviour
             gameEngine.EndAni();
             yield return null;
         }
+
+        
+
+        yield return null;
     }
 
     public void LoadFile()
